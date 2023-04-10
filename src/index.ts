@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(authRoutes);
+app.use("/", authRoutes);
 
 mongoose
   .connect(mongoDBUri)
@@ -28,12 +28,12 @@ mongoose
     console.log("error connecting to db", err);
   });
 
-app.get("/set-cookies", (req, res) => {
-  res.cookie("newUser", false, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true });
-  res.send("you set a cookie");
-});
+// app.get("/set-cookies", (req, res) => {
+//   res.cookie("newUser", false, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true });
+//   res.send("you set a cookie");
+// });
 
-app.get("/get-cookies", (req, res) => {
-  console.log(req.cookies);
-  res.send(req.cookies);
-});
+// app.get("/get-cookies", (req, res) => {
+//   console.log(req.cookies);
+//   res.send(req.cookies);
+// });

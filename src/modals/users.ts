@@ -1,8 +1,17 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 import isEmail from "validator/lib/isEmail";
 import bcrypt from "bcrypt";
 
-const userSchema = new mongoose.Schema(
+interface IUser {
+  companyName: string;
+  email: string;
+  twitterUsername: string;
+  password: string;
+}
+interface UserModel extends Model<IUser> {
+  login(email: string, password: string): any;
+}
+const userSchema = new mongoose.Schema<IUser, UserModel>(
   {
     companyName: {
       type: String,
@@ -36,7 +45,17 @@ userSchema.pre("save", async function (next) {
 });
 
 // static method to login user
-// userSchema.static.login({email, password})
+userSchema.static("login", async function login(email, password) {
+  const user = await this.findOne({ email });
+  if (user) {
+    const isAuth = await bcrypt.compare(password, user.password);
+    if (isAuth) {
+      return user;
+    }
+    throw Error("Incorrect Password");
+  }
+  throw Error("Incorrect Email");
+});
 
-const User = mongoose.model("user", userSchema);
+const User = mongoose.model<IUser, UserModel>("user", userSchema);
 export default User;
