@@ -3,7 +3,7 @@ export function handleErrors(err: any) {
   let errors: string[] = [];
 
   if (err.code === 11000) {
-    errors.push("That email is already taken");
+    errors.push("That email/Twitter Username is already taken");
     return errors;
   }
 
