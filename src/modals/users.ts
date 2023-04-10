@@ -4,6 +4,10 @@ import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
   {
+    companyName: {
+      type: String,
+      required: [true, "Please enter your company name"],
+    },
     email: {
       type: String,
       required: [true, "Please enter an email"],
@@ -25,9 +29,14 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// hashing the password for security purposes
 userSchema.pre("save", async function (next) {
   this.password = bcrypt.hashSync(this.password, 10);
   next();
 });
+
+// static method to login user
+// userSchema.static.login({email, password})
+
 const User = mongoose.model("user", userSchema);
 export default User;
