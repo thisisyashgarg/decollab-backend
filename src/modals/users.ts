@@ -7,6 +7,30 @@ interface IUser {
   email: string;
   twitterUsername: string;
   password: string;
+  logoUrl?: string;
+  about?: string;
+  followers?: number;
+  socialLinks?: string[];
+  tags?: string[];
+  flexPosts?: string[];
+  teamMembers?: {
+    name: string;
+    profilePic: string;
+    socialLink: string;
+  }[];
+  brandsCollaborated?: string[];
+  posts?: {
+    id: string;
+    description: string;
+    views: number;
+    tags: string[];
+    timeFrame: string;
+    companiesReachedOut: string[];
+  }[];
+  fundings?: {
+    round: string;
+    amount: number;
+  }[];
 }
 interface UserModel extends Model<IUser> {
   login(email: string, password: string): any;
@@ -33,6 +57,44 @@ const userSchema = new mongoose.Schema<IUser, UserModel>(
       type: String,
       required: [true, "Please enter a password"],
       minlength: [8, "Minimum password length is 8 characters"],
+    },
+    logoUrl: { type: String },
+    about: { type: String },
+    followers: { type: Number },
+    socialLinks: {
+      type: [String],
+    },
+    tags: { type: [String], lowercase: true, unique: true },
+    flexPosts: { type: [String] },
+    teamMembers: {
+      type: [
+        {
+          name: { type: String },
+          profilePic: { type: String },
+          socialLink: { type: String },
+        },
+      ],
+    },
+    brandsCollaborated: { type: [String] },
+    posts: {
+      type: [
+        {
+          id: { type: String },
+          description: { type: String },
+          views: { type: Number },
+          tags: { type: [String] },
+          timeFrame: { type: String },
+          companiesReachedOut: { type: [String] },
+        },
+      ],
+    },
+    fundings: {
+      type: [
+        {
+          round: { type: String },
+          amount: { type: Number },
+        },
+      ],
     },
   },
   { timestamps: true }
