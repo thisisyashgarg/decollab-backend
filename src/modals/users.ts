@@ -20,12 +20,11 @@ interface IUser {
   }[];
   brandsCollaborated?: string[];
   posts?: {
-    id: string;
     description: string;
     views: number;
     tags: string[];
     timeFrame: string;
-    companiesReachedOut: string[];
+    companiesReachedOut: number;
   }[];
   fundings?: {
     round: string;
@@ -79,12 +78,11 @@ const userSchema = new mongoose.Schema<IUser, UserModel>(
     posts: {
       type: [
         {
-          id: { type: String },
           description: { type: String },
           views: { type: Number },
           tags: { type: [String] },
           timeFrame: { type: String },
-          companiesReachedOut: { type: [String] },
+          companiesReachedOut: { type: Number },
         },
       ],
     },
