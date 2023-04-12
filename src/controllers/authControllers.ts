@@ -15,7 +15,7 @@ export async function signup(req: Request, res: Response) {
     });
     const token = createJWT(user._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: 100 * jwtValidity });
-    res.status(201).send({ user: user._id });
+    res.status(201).send(user);
   } catch (err) {
     const errors = handleErrors(err).map((error) => error);
     res.status(400).json(errors);
@@ -28,7 +28,7 @@ export async function login(req: Request, res: Response) {
     const user = await User.login(email, password);
     const token = createJWT(user._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: 100 * jwtValidity });
-    res.status(200).send({ user: user._id });
+    res.status(200).send(user);
   } catch (err) {
     const errors = handleErrors(err).map((error) => error);
     res.status(400).send(errors);
@@ -42,11 +42,11 @@ export async function profileUpdate(req: Request, res: Response) {
     flexPosts,
     brandsCollaborated,
     teamMembers,
-    posts,
     fundings,
   } = req.body;
 
   try {
+    // _id will be sent by the client
     const user = await User.findOneAndUpdate(
       { _id: "64352b7738f43b0e93cacf9e" },
       {
@@ -64,7 +64,26 @@ export async function profileUpdate(req: Request, res: Response) {
   }
 }
 
+export async function createPost(req: Request, res: Response) {
+  const post = req.body;
+  try {
+    // _id will be sent by the client
+    const user = await User.findOneAndUpdate(
+      { _id: "64352b7738f43b0e93cacf9e" },
+      {
+        $push: {
+          posts: post,
+        },
+      }
+    );
+    res.status(200).send(user?.posts);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+}
+
 export async function logout(req: Request, res: Response) {
   res.cookie("jwt", "", { maxAge: 1 });
-  // redirect to login page on client side, useEffect will jwt, which is not present and logs out
+  res.end();
+  // redirect to login page on client side, useEffect will check jwt, which is not present and logs out
 }
