@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import User from "../modals/users";
 import { handleErrors } from "../helper";
 import createJWT, { jwtValidity } from "../services/createJWT";
+import jwt from "jsonwebtoken";
 
 export async function signup(req: Request, res: Response) {
   const { companyName, email, password, twitterUsername } = req.body;
@@ -87,3 +88,25 @@ export async function logout(req: Request, res: Response) {
   res.end();
   // redirect to login page on client side, useEffect will check jwt, which is not present and logs out
 }
+
+// this middleware is for server side, if we are on client side we just have to check cookies
+export const auth = (req: Request, res: Response) => {
+  const token = req.cookies.jwt;
+  // check jwt and validate it
+  if (token) {
+    jwt.verify(
+      token,
+      `${process.env.JWT_SECRET}`,
+      (err: any, decodedToken: any) => {
+        if (err) {
+          console.log(err.message);
+          res.json({ isValidUser: false }); // do next what has to be done , eg is given here
+        } else {
+          res.json({ isValidUser: true }); // do next what has to be done , eg is given here
+        }
+      }
+    );
+  } else {
+    res.json({ isValidUser: false });
+  }
+};
