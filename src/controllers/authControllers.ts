@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import User from "../modals/users";
+import User, { IUser } from "../modals/users";
 import { handleErrors } from "../helper";
 import createJWT, { jwtValidity } from "../services/createJWT";
-import jwt from "jsonwebtoken";
+import jwt, { decode } from "jsonwebtoken";
 
 export async function signup(req: Request, res: Response) {
-  const { companyName, email, password, twitterUsername } = req.body;
+  const { companyName, email, password, twitterUsername, tags } = req.body;
 
   try {
     const user = await User.create({
@@ -13,6 +13,7 @@ export async function signup(req: Request, res: Response) {
       email,
       twitterUsername,
       password,
+      tags,
     });
     const token = createJWT(user._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: 100 * jwtValidity });
@@ -66,20 +67,23 @@ export async function profileUpdate(req: Request, res: Response) {
 }
 
 export async function createPost(req: Request, res: Response) {
-  const post = req.body;
+  const post = req.body[0];
+  const userId = req.body[1].id;
+  console.log(post, userId);
+
   try {
     // _id will be sent by the client
     const user = await User.findOneAndUpdate(
-      { _id: "64352b7738f43b0e93cacf9e" },
+      { _id: userId },
       {
         $push: {
           posts: post,
         },
       }
     );
-    res.status(200).send(user?.posts);
+    res.status(200).json(user);
   } catch (err) {
-    res.status(400).send(err);
+    res.status(400).json(err);
   }
 }
 
@@ -100,13 +104,31 @@ export const auth = (req: Request, res: Response) => {
       (err: any, decodedToken: any) => {
         if (err) {
           console.log(err.message);
-          res.json({ isValidUser: false }); // do next what has to be done , eg is given here
+          res.send(false); // do next what has to be done , eg is given here
         } else {
-          res.json({ isValidUser: true }); // do next what has to be done , eg is given here
+          res.send(true); // do next what has to be done , eg is given here
         }
       }
     );
   } else {
-    res.json({ isValidUser: false });
+    res.send(false);
   }
 };
+
+export async function search(req: Request, res: Response) {
+  console.log(req.query);
+  // redirect to login page on client side, useEffect will check jwt, which is not present and logs out
+}
+
+export async function getAllPosts(req: Request, res: Response) {
+  try {
+    const allUsers = await User.find({});
+    const allPosts = allUsers.reduce(
+      (acc, user: any) => acc.concat(user.posts),
+      []
+    );
+    res.status(200).send(allPosts);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+}

@@ -2,7 +2,7 @@ import mongoose, { Model } from "mongoose";
 import isEmail from "validator/lib/isEmail";
 import bcrypt from "bcrypt";
 
-interface IUser {
+export interface IUser {
   companyName: string;
   email: string;
   twitterUsername: string;
@@ -20,6 +20,8 @@ interface IUser {
   }[];
   brandsCollaborated?: string[];
   posts?: {
+    companyName: string;
+    followers: number;
     description: string;
     views: number;
     tags: string[];
@@ -63,7 +65,7 @@ const userSchema = new mongoose.Schema<IUser, UserModel>(
     socialLinks: {
       type: [String],
     },
-    tags: { type: [String], lowercase: true, unique: true },
+    tags: { type: [String], lowercase: true },
     flexPosts: { type: [String] },
     teamMembers: {
       type: [
@@ -78,6 +80,8 @@ const userSchema = new mongoose.Schema<IUser, UserModel>(
     posts: {
       type: [
         {
+          companyName: { type: String },
+          followers: { type: Number },
           description: { type: String },
           views: { type: Number },
           tags: { type: [String] },

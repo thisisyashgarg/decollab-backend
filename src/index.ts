@@ -35,13 +35,3 @@ mongoose
   .catch((err) => {
     console.log("error connecting to db", err);
   });
-
-// app.get("/set-cookies", (req, res) => {
-//   res.cookie("newUser", false, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true });
-//   res.send("you set a cookie");
-// });
-
-// app.get("/get-cookies", (req, res) => {
-//   console.log(req.cookies);
-//   res.send(req.cookies);
-// });
