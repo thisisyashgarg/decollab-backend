@@ -17,6 +17,7 @@ router.get("/logout", logout);
 router.post("/login", login);
 router.get("/auth", auth);
 router.post("/search", search);
+
 router.get("/posts", getAllPosts); // get all posts from the db
 router.post("/profile/update", profileUpdate);
 router.post("/collabhub/create", createPost);

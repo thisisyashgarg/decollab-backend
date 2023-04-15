@@ -38,25 +38,19 @@ export async function login(req: Request, res: Response) {
 }
 
 export async function profileUpdate(req: Request, res: Response) {
-  const {
-    socialLinks,
-    tags,
-    flexPosts,
-    brandsCollaborated,
-    teamMembers,
-    fundings,
-  } = req.body;
+  const { companyName, about, logoUrl } = req.body[0];
+  const userId = req.body[1].id;
+  console.log(userId, req.body[0]);
 
   try {
     // _id will be sent by the client
     const user = await User.findOneAndUpdate(
-      { _id: "64352b7738f43b0e93cacf9e" },
+      { _id: userId },
       {
-        $addToSet: {
-          tags: tags,
-          socialLinks: socialLinks,
-          teamMembers: teamMembers,
-          brandsCollaborated: brandsCollaborated,
+        $set: {
+          companyName: companyName,
+          about: about,
+          logoUrl: logoUrl,
         },
       }
     );
@@ -97,21 +91,26 @@ export async function logout(req: Request, res: Response) {
 export const auth = (req: Request, res: Response) => {
   const token = req.cookies.jwt;
   // check jwt and validate it
-  if (token) {
-    jwt.verify(
-      token,
-      `${process.env.JWT_SECRET}`,
-      (err: any, decodedToken: any) => {
-        if (err) {
-          console.log(err.message);
-          res.send(false); // do next what has to be done , eg is given here
-        } else {
-          res.send(true); // do next what has to be done , eg is given here
+  try {
+    if (token) {
+      jwt.verify(
+        token,
+        `${process.env.JWT_SECRET}`,
+        (err: any, decodedToken: any) => {
+          if (err) {
+            console.log(err.message);
+            res.status(400).json({ err: err.message });
+          } else {
+            console.log(decodedToken.id);
+            res.status(200).json({ userId: decodedToken.id });
+          }
         }
-      }
-    );
-  } else {
-    res.send(false);
+      );
+    } else {
+      res.status(400).json({ err: "No jwt found" });
+    }
+  } catch (err: any) {
+    res.status(400).json({ err: err.message });
   }
 };
 

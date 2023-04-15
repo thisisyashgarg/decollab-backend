@@ -20,6 +20,7 @@ export interface IUser {
   }[];
   brandsCollaborated?: string[];
   posts?: {
+    logoUrl: string;
     companyName: string;
     followers: number;
     description: string;
@@ -80,6 +81,7 @@ const userSchema = new mongoose.Schema<IUser, UserModel>(
     posts: {
       type: [
         {
+          logoUrl: { type: String },
           companyName: { type: String },
           followers: { type: Number },
           description: { type: String },
