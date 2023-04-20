@@ -13,7 +13,6 @@ export const requireAuth = (req: any, res: any, next: any) => {
           console.log(err.message);
           res.json(false); // do next what has to be done , eg is given here
         } else {
-          console.log(decodedToken);
           res.json(decodedToken); // do next what has to be done , eg is given here
           next();
         }

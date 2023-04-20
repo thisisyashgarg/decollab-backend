@@ -8,6 +8,7 @@ import {
   auth,
   search,
   getAllPosts,
+  getNewCompaniesFromTag,
 } from "../controllers/authControllers";
 
 const router = Router();
@@ -16,7 +17,8 @@ router.post("/signup", signup);
 router.get("/logout", logout);
 router.post("/login", login);
 router.get("/auth", auth);
-router.post("/search", search);
+router.post("/newcompanies", getNewCompaniesFromTag);
+router.get("/search", search);
 
 router.get("/posts", getAllPosts); // get all posts from the db
 router.post("/profile/update", profileUpdate);

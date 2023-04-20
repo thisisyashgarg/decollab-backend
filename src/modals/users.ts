@@ -11,7 +11,10 @@ export interface IUser {
   about?: string;
   followers?: number;
   socialLinks?: string[];
-  tags?: string[];
+  tags?: {
+    tagName: string;
+    id: string;
+  }[];
   flexPosts?: string[];
   teamMembers?: {
     name: string;
@@ -66,7 +69,10 @@ const userSchema = new mongoose.Schema<IUser, UserModel>(
     socialLinks: {
       type: [String],
     },
-    tags: { type: [String], lowercase: true },
+    tags: {
+      type: [{ tagName: { type: String }, id: { type: String } }],
+      lowercase: true,
+    },
     flexPosts: { type: [String] },
     teamMembers: {
       type: [

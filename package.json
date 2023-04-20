@@ -29,6 +29,7 @@
     "@types/jsonwebtoken": "^9.0.1",
     "@types/validator": "^13.7.14",
     "cors": "^2.8.5",
+    "nanoid": "^4.0.2",
     "validator": "^13.9.0"
   }
 }

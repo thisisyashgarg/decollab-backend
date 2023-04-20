@@ -11,7 +11,7 @@ export function handleErrors(err: any) {
   }
 
   if (err.code === 11000) {
-    errors.push("That email/Twitter Username is already taken");
+    errors.push(err.message);
     return errors;
   }
 

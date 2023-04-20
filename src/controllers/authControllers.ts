@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import User, { IUser } from "../modals/users";
 import { handleErrors } from "../helper";
 import createJWT, { jwtValidity } from "../services/createJWT";
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 export async function signup(req: Request, res: Response) {
-  const { companyName, email, password, twitterUsername, tags } = req.body;
+  const { companyName, email, password, twitterUsername } = req.body;
 
   try {
     const user = await User.create({
@@ -13,7 +13,6 @@ export async function signup(req: Request, res: Response) {
       email,
       twitterUsername,
       password,
-      tags,
     });
     const token = createJWT(user._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: 100 * jwtValidity });
@@ -38,9 +37,9 @@ export async function login(req: Request, res: Response) {
 }
 
 export async function profileUpdate(req: Request, res: Response) {
-  const { companyName, about, logoUrl } = req.body[0];
+  const { companyName, about, logoUrl, tags } = req.body[0];
   const userId = req.body[1].id;
-  console.log(userId, req.body[0]);
+  console.log(req.body[0]);
 
   try {
     // _id will be sent by the client
@@ -51,10 +50,11 @@ export async function profileUpdate(req: Request, res: Response) {
           companyName: companyName,
           about: about,
           logoUrl: logoUrl,
+          tags: tags,
         },
       }
     );
-    res.status(200).send(user);
+    res.status(200).json(user);
   } catch (err) {
     res.status(400).send(err);
   }
@@ -63,7 +63,7 @@ export async function profileUpdate(req: Request, res: Response) {
 export async function createPost(req: Request, res: Response) {
   const post = req.body[0];
   const userId = req.body[1].id;
-  console.log(post, userId);
+  console.log(post);
 
   try {
     // _id will be sent by the client
@@ -90,19 +90,18 @@ export async function logout(req: Request, res: Response) {
 // this middleware is for server side, if we are on client side we just have to check cookies
 export const auth = (req: Request, res: Response) => {
   const token = req.cookies.jwt;
-  // check jwt and validate it
   try {
     if (token) {
       jwt.verify(
         token,
         `${process.env.JWT_SECRET}`,
-        (err: any, decodedToken: any) => {
+        async (err: any, decodedToken: any) => {
           if (err) {
             console.log(err.message);
             res.status(400).json({ err: err.message });
           } else {
-            console.log(decodedToken.id);
-            res.status(200).json({ userId: decodedToken.id });
+            const user = await User.find({ _id: decodedToken.id });
+            res.status(200).json(user);
           }
         }
       );
@@ -114,11 +113,6 @@ export const auth = (req: Request, res: Response) => {
   }
 };
 
-export async function search(req: Request, res: Response) {
-  console.log(req.query);
-  // redirect to login page on client side, useEffect will check jwt, which is not present and logs out
-}
-
 export async function getAllPosts(req: Request, res: Response) {
   try {
     const allUsers = await User.find({});
@@ -129,5 +123,27 @@ export async function getAllPosts(req: Request, res: Response) {
     res.status(200).send(allPosts);
   } catch (err) {
     res.status(400).json(err);
+  }
+}
+
+export async function getNewCompaniesFromTag(req: Request, res: Response) {
+  const tag = req.body.tag;
+  try {
+    const users = await User.find({ tags: { $elemMatch: { tagName: tag } } });
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(400).json({ err: err });
+  }
+}
+
+export async function search(req: Request, res: Response) {
+  const searchQuery = req.query.q;
+  try {
+    const users = await User.find({
+      companyName: { $regex: searchQuery, $options: "i" },
+    });
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(400).json({ err: err });
   }
 }
