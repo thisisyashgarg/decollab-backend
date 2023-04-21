@@ -1,17 +1,17 @@
 import { Request, Response } from "express";
-import User, { IUser } from "../modals/users";
+import User from "../modals/users";
 import { handleErrors } from "../helper";
 import createJWT, { jwtValidity } from "../services/createJWT";
 import jwt from "jsonwebtoken";
 
 export async function signup(req: Request, res: Response) {
-  const { companyName, email, password, twitterUsername } = req.body;
+  const { companyName, email, password, tags } = req.body;
 
   try {
     const user = await User.create({
       companyName,
       email,
-      twitterUsername,
+      tags,
       password,
     });
     const token = createJWT(user._id);

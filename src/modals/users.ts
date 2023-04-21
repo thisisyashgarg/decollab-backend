@@ -5,7 +5,6 @@ import bcrypt from "bcrypt";
 export interface IUser {
   companyName: string;
   email: string;
-  twitterUsername: string;
   password: string;
   logoUrl?: string;
   about?: string;
@@ -53,11 +52,7 @@ const userSchema = new mongoose.Schema<IUser, UserModel>(
       lowercase: true,
       validate: [isEmail, "Please enter a valid email"],
     },
-    twitterUsername: {
-      type: String,
-      required: false,
-      unique: true,
-    },
+
     password: {
       type: String,
       required: [true, "Please enter a password"],
