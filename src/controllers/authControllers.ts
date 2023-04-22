@@ -140,7 +140,14 @@ export async function search(req: Request, res: Response) {
   const searchQuery = req.query.q;
   try {
     const users = await User.find({
-      companyName: { $regex: searchQuery, $options: "i" },
+      $or: [
+        { companyName: { $regex: searchQuery, $options: "i" } },
+        {
+          tags: {
+            $elemMatch: { tagName: { $regex: searchQuery, $options: "i" } },
+          },
+        },
+      ],
     });
     res.status(200).json(users);
   } catch (err) {
