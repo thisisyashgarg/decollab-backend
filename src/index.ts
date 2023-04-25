@@ -6,7 +6,8 @@ import authRoutes from "./routes/authRoutes";
 import bodyParser from "body-parser";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import passport, { session } from "passport";
+import session from "express-session";
+import passport from "passport";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -19,10 +20,21 @@ app.use(
     credentials: true,
   })
 );
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+// Middleware configuration
+// app.use(session());
+// app.use(passport.initialize());
+// app.use(passport.session());
+// app.use(
+//   session({
+//     secret: `aghsdjfhkavwkdfsed`,
+//     resave: true,
+//     saveUninitialized: true,
+//   })
+// );
 app.use("/", authRoutes);
 
 mongoose
@@ -36,3 +48,5 @@ mongoose
   .catch((err) => {
     console.log("error connecting to db", err);
   });
+
+export default app;

@@ -3,6 +3,7 @@ import User from "../modals/users";
 import { handleErrors } from "../helper";
 import createJWT, { jwtValidity } from "../services/createJWT";
 import jwt from "jsonwebtoken";
+import passport from "passport";
 
 export async function signup(req: Request, res: Response) {
   const { companyName, email, password, tags } = req.body;
@@ -87,32 +88,6 @@ export async function logout(req: Request, res: Response) {
   // redirect to login page on client side, useEffect will check jwt, which is not present and logs out
 }
 
-// this middleware is for server side, if we are on client side we just have to check cookies
-export const auth = (req: Request, res: Response) => {
-  const token = req.cookies.jwt;
-  try {
-    if (token) {
-      jwt.verify(
-        token,
-        `${process.env.JWT_SECRET}`,
-        async (err: any, decodedToken: any) => {
-          if (err) {
-            console.log(err.message);
-            res.status(400).json({ err: err.message });
-          } else {
-            const user = await User.find({ _id: decodedToken.id });
-            res.status(200).json(user);
-          }
-        }
-      );
-    } else {
-      res.status(400).json({ err: "No jwt found" });
-    }
-  } catch (err: any) {
-    res.status(400).json({ err: err.message });
-  }
-};
-
 export async function getAllPosts(req: Request, res: Response) {
   try {
     const allUsers = await User.find({});
@@ -154,3 +129,41 @@ export async function search(req: Request, res: Response) {
     res.status(400).json({ err: err });
   }
 }
+
+export async function twitterAuth(req: Request, res: Response) {
+  try {
+    passport.authenticate("twitter", { failureRedirect: "/login" }),
+      function (req: Request, res: Response) {
+        // Successful authentication, redirect home.
+        console.log("twitter auth succesfull");
+      };
+  } catch (err) {
+    res.status(400).json({ err: err });
+  }
+}
+
+// this middleware is for server side, if we are on client side we just have to check cookies
+export const auth = (req: Request, res: Response) => {
+  const token = req.cookies.jwt;
+  try {
+    if (token) {
+      jwt.verify(
+        token,
+        `${process.env.JWT_SECRET}`,
+        async (err: any, decodedToken: any) => {
+          if (err) {
+            console.log(err.message);
+            res.status(400).json({ err: err.message });
+          } else {
+            const user = await User.find({ _id: decodedToken.id });
+            res.status(200).json(user);
+          }
+        }
+      );
+    } else {
+      res.status(400).json({ err: "No jwt found" });
+    }
+  } catch (err: any) {
+    res.status(400).json({ err: err.message });
+  }
+};
