@@ -2,7 +2,7 @@ import express from "express";
 import { config } from "dotenv";
 config();
 import mongoose from "mongoose";
-import authRoutes from "./routes/authRoutes";
+import allRoutes from "./routes/allRoutes";
 import bodyParser from "body-parser";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -34,7 +34,7 @@ app.use(cookieParser());
 //   })
 // );
 
-app.use("/", authRoutes);
+app.use("/", allRoutes);
 
 mongoose
   .connect(`${mongoDBUri}`)

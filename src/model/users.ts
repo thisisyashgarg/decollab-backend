@@ -47,6 +47,7 @@ export interface IUser {
 interface UserModel extends Model<IUser> {
   login(email: string, password: string): any;
 }
+
 export const userSchema = new mongoose.Schema<IUser, UserModel>(
   {
     companyName: {

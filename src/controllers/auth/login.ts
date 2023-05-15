@@ -30,9 +30,3 @@ userSchema.static("login", async function login(email, password) {
   }
   throw Error("Incorrect Email");
 });
-
-// hashing the password for security purposes
-userSchema.pre("save", async function (next) {
-  this.password = bcrypt.hashSync(this.password, 10);
-  next();
-});
