@@ -1,6 +1,5 @@
 import mongoose, { Model } from "mongoose";
 import isEmail from "validator/lib/isEmail";
-import bcrypt from "bcrypt";
 
 export interface IUser {
   companyName: string;
@@ -9,18 +8,26 @@ export interface IUser {
   logoUrl?: string;
   about?: string;
   followers?: number;
-  socialLinks?: string[];
+  socialLinks?: {
+    name: string;
+    url: string;
+  }[];
   tags?: {
     tagName: string;
     id: string;
   }[];
-  flexPosts?: string[];
+  flexPosts?: {
+    post: string;
+  }[];
   teamMembers?: {
     name: string;
     profilePic: string;
     socialLink: string;
   }[];
-  brandsCollaborated?: string[];
+  brandsCollaborated?: {
+    brandName: string;
+    brandLogo: string;
+  }[];
   posts?: {
     logoUrl: string;
     companyName: string;
@@ -36,10 +43,11 @@ export interface IUser {
     amount: number;
   }[];
 }
+
 interface UserModel extends Model<IUser> {
   login(email: string, password: string): any;
 }
-const userSchema = new mongoose.Schema<IUser, UserModel>(
+export const userSchema = new mongoose.Schema<IUser, UserModel>(
   {
     companyName: {
       type: String,
@@ -62,13 +70,24 @@ const userSchema = new mongoose.Schema<IUser, UserModel>(
     about: { type: String },
     followers: { type: Number },
     socialLinks: {
-      type: [String],
+      type: [
+        {
+          name: { type: String },
+          url: { type: String },
+        },
+      ],
     },
     tags: {
       type: [{ tagName: { type: String }, id: { type: String } }],
       lowercase: true,
     },
-    flexPosts: { type: [String] },
+    flexPosts: {
+      type: [
+        {
+          post: { type: String },
+        },
+      ],
+    },
     teamMembers: {
       type: [
         {
@@ -78,7 +97,14 @@ const userSchema = new mongoose.Schema<IUser, UserModel>(
         },
       ],
     },
-    brandsCollaborated: { type: [String] },
+    brandsCollaborated: {
+      type: [
+        {
+          brandName: { type: String },
+          brandLogo: { type: String },
+        },
+      ],
+    },
     posts: {
       type: [
         {
@@ -104,25 +130,6 @@ const userSchema = new mongoose.Schema<IUser, UserModel>(
   },
   { timestamps: true }
 );
-
-// hashing the password for security purposes
-userSchema.pre("save", async function (next) {
-  this.password = bcrypt.hashSync(this.password, 10);
-  next();
-});
-
-// static method to login user
-userSchema.static("login", async function login(email, password) {
-  const user = await this.findOne({ email });
-  if (user) {
-    const isAuth = await bcrypt.compare(password, user.password);
-    if (isAuth) {
-      return user;
-    }
-    throw Error("Incorrect Password");
-  }
-  throw Error("Incorrect Email");
-});
 
 const User = mongoose.model<IUser, UserModel>("user", userSchema);
 export default User;
