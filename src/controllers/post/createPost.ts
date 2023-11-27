@@ -4,7 +4,7 @@ import User from "../../model/users";
 export default async function createPost(req: Request, res: Response) {
   const post = req.body[0];
   const userId = req.body[1].id;
-  console.log(post);
+  console.log(req.body);
 
   try {
     // _id will be sent by the client
@@ -16,8 +16,9 @@ export default async function createPost(req: Request, res: Response) {
         },
       }
     );
-    res.status(200).json(user);
+    return res.status(200).json(user);
   } catch (err) {
-    res.status(400).json(err);
+    console.log(err)
+    return res.status(400).json(err);
   }
 }

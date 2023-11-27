@@ -8,10 +8,16 @@ import { userSchema } from "../../model/users";
 export default async function login(req: Request, res: Response) {
   const { email, password } = req.body;
   try {
-    const user = await User.login(email, password);
-    const token = createJWT(user._id);
-    res.cookie("jwt", token, { httpOnly: true, maxAge: 100 * jwtValidity });
-    res.status(200).send(user);
+    console.log(email, password, "login")
+    const user = await User.findOne({ email, password });
+    console.log(user, 'user')
+    if (user) {
+      const token = createJWT(user?.id);
+      res.cookie("jwt", token, { httpOnly: true, maxAge: 100 * jwtValidity });
+      return res.status(200).send(user);
+    } else {
+      return res.status(400).send("User not found");
+    }
   } catch (err) {
     const errors = handleErrors(err).map((error) => error);
     res.status(400).send(errors);
